@@ -1,0 +1,75 @@
+pragma solidity ^0.4.0;
+contract Voting
+{
+    address owner;
+    string candidate1;
+    string candidate2;
+    mapping (address => voter) private voterDetails;
+    mapping (string => candidate) private candidateDetails;
+    
+    struct voter
+    {
+        bool valid;
+        address add;
+        bool vote;
+        uint weight;
+    }
+    
+    struct candidate
+    {
+        string candidateName;
+        uint count;
+    }
+    
+    modifier isOwner
+    {
+        require(owner== msg.sender);
+        _;
+    }
+    
+    modifier isValid
+    {
+        require(voterDetails[msg.sender].vote== false && voterDetails[msg.sender].valid== true);
+        _;
+    }
+    
+    function Voting(string A, string B)
+    {
+        owner= msg.sender;
+        candidate1= A;
+        candidate2= B;
+        candidateDetails[candidate1].candidateName = candidate1;
+        candidateDetails[candidate1].count= 0;
+        candidateDetails[candidate2].candidateName= candidate2;
+        candidateDetails[candidate2].count= 0;
+    }
+    
+    function Verification (address add) isOwner public
+    {
+        voterDetails[add].valid= true;
+        voterDetails[add].add= add;
+        voterDetails[add].vote= false;
+        voterDetails[add].weight= 1;
+    }
+    
+    function castVote(string can) isValid public
+    {
+        candidateDetails[can].count+= voterDetails[msg.sender].weight;
+        voterDetails[msg.sender].vote= true;
+        voterDetails[msg.sender].weight= 0;
+    }
+    
+    function result() isOwner returns (string)
+    {
+        if(candidateDetails[candidate1].count > candidateDetails[candidate2].count)
+        {
+            return candidateDetails[candidate1].candidateName;
+        }
+        else
+        {
+            return candidateDetails[candidate2].candidateName;
+        }
+    }
+    
+    
+}
