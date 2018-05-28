@@ -1,0 +1,57 @@
+pragma solidity ^0.4.0;
+
+contract Lottery
+{
+    address owner;
+    uint noOfTickets;
+    uint random_no= 1000;
+    uint price= 10 * 1 ether;
+    address myAdd = this;
+    uint hash;
+    uint ticketsSold;
+    string winner;
+    buyer[] lotteryBuyers;
+    
+    struct buyer
+    {
+        address add;
+        string name;
+        uint ticketNo;
+        uint phone;
+    }
+    
+    modifier checkBalance
+    {
+        require(msg.sender.balance >= 10);
+        _;
+    }
+    
+    function buyTicket(string buyerName, uint phoneNumber) checkBalance payable
+    {
+        lotteryBuyers.push(buyer(msg.sender, buyerName, random_no++, phoneNumber));
+        ticketsSold++;
+    }
+    
+    function Lottery() payable
+    {
+        owner= msg.sender;
+    }
+    
+    function sha() constant private returns(uint)
+    {
+        return uint(sha3(block.difficulty, now, noOfTickets));
+    }
+    
+    function result() payable returns (string)
+    {
+        uint resultOfSha=sha();
+        uint a = resultOfSha%10;
+        if(a>=0 && a<=9)
+        {
+            string winner= lotteryBuyers[a].name;
+        }
+        return winner;
+    }
+    
+}
+}
